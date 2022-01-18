@@ -10,8 +10,7 @@ Keycloak instances and proxy require unique public listed DNS records.
 *keycloak.proxy.example.net*
 ```
 
-Proxy is managing instances via *keycloak-proxy.yaml* configuration file, located in the git repository of the *infrastructure* chart.
-New keycloak instances are automatically added to the file via kubernetes job.
+Keycloak instances are listed in to the configuration file *keycloak-proxy.yaml* , located in the git repository of the *infrastructure* namespaces.
 
 ### Infrastructure chart
 1. Set DNS, keycloak-instance/database/git credentials for default keycloak instance in *infrastructure/values.yaml*   
