@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-instance-config-init
+spec:
+  template:
+    spec:
+      containers:
+      - name: keycloak-instance-config-commit
+        image: docker.yuuvis.org/yuuvis/yq-utility:stable
+        imagePullPolicy: Always
+        command: ['sh', '/yuuvis/script/init-keycloak-instance.sh']
+        volumeMounts:
+        - mountPath: /yuuvis/data
+          name: keycloak-proxy-yml-config
+        - mountPath: /yuuvis/script/init-keycloak-instance.sh
+          name: init-keycloak-instance-script
+          subPath: init-keycloak-instance.sh
+      volumes:
+      - configMap:
+          name: keycloak-proxy-yml-configmap
+        name: keycloak-proxy-yml-config
+      - configMap:
+          name: init-keycloak-instance-configmap
+        name: init-keycloak-instance-script
+      imagePullSecrets:
+      - name: yuuvisorg    
+      restartPolicy: OnFailure   

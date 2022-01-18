@@ -1,0 +1,74 @@
+imageCredentials:
+  yuuvisorg:
+    registry: docker.yuuvis.org
+    username:
+    password:
+
+yuuvis:
+  db:
+    user: postgres
+    password: ${DB_ADMIN_PWD} 
+  keycloak:
+    #Increment with each additional instance
+    address: kc002.example.net
+    user: ${KEYCLOAK_ADMIN_USER}
+    password: ${KEYCLOAK_ADMIN_PWD}
+    db:
+      name: keycloak_instance_2
+      user: keycloak
+      password: ${KEYCLOAK_DB_PWD}
+  git:
+    protocol: http
+    url: gitea-http.infrastructure:3000/yuuvis/yuuvis-config.git
+    server: gitea-http.infrastructure:3000
+    name: yuuvis-config
+    user: ${GITUSER}
+    password: ${GITPWD}
+    branch: master
+
+keycloak:
+  enabled: true
+  fullnameOverride: "keycloak"
+  image.repository: docker.yuuvis.org/yuuvis/keycloak
+  image.tag: 15.0.2-stable1
+  livenessProbe: |
+    httpGet:
+      path: /auth/
+      port: http
+    initialDelaySeconds: 600
+    timeoutSeconds: 5
+  postgresql:
+    enabled: false
+  extraEnv: |
+    - name: KEYCLOAK_USER_FILE
+      value: /secrets/keycloak/user
+    - name: KEYCLOAK_PASSWORD_FILE
+      value: /secrets/keycloak/password
+    - name: PROXY_ADDRESS_FORWARDING
+      value: "true"
+    - name: DB_VENDOR
+      value: postgres
+    - name: DB_ADDR
+      value: postgresql
+    - name: DB_PORT
+      value: "5432"
+    - name: DB_DATABASE
+      value: keycloak
+    - name: DB_USER_FILE
+      value: /secrets/db-creds/user
+    - name: DB_PASSWORD_FILE
+      value: /secrets/db-creds/password
+  extraVolumes: |
+    - name: db-creds
+      secret:
+        secretName: keycloakdb
+    - name: kc-creds
+      secret:
+        secretName: keycloakuser
+  extraVolumeMounts: |
+    - name: db-creds
+      mountPath: /secrets/db-creds
+      readOnly: true
+    - name: kc-creds
+      mountPath: /secrets/keycloak
+      readOnly: true

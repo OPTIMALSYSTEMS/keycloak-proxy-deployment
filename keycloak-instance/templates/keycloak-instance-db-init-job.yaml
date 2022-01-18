@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-instance-db-init
+spec:
+  template:
+    spec:
+      containers:
+      - name: keycloak-instance-db-init
+        image: docker.yuuvis.org/yuuvis/helper/init-helper:latest
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '/yuuvis/script/init-keycloak-db.sh']
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: postgres-secret
+        volumeMounts:
+        - mountPath: /yuuvis/script/init-keycloak-db.sh
+          name: keycloak-instance-db-init
+          subPath: init-keycloak-db.sh
+      volumes:
+      - configMap:
+          name: keycloak-instance-db-init
+        name: keycloak-instance-db-init
+      imagePullSecrets:
+      - name: yuuvisorg    
+      restartPolicy: OnFailure   

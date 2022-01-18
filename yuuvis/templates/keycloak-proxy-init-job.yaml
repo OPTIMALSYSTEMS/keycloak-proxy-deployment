@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-proxy-config-init
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: init-repository
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "{{.Values.initContainer.command}}"]
+      containers:
+      - name: keycloak-proxy-config-commit
+        image: docker.yuuvis.org/yuuvis/yq-utility:stable
+        imagePullPolicy: Always
+        command: ['sh', '/yuuvis/script/initproxy.sh']
+        volumeMounts:
+        - mountPath: /yuuvis/data
+          name: keycloak-proxy-yml-config
+          readOnly: false
+        - mountPath: /yuuvis/script/initproxy.sh
+          name: init-proxy-script
+          subPath: init-proxy.sh
+          readOnly: false
+      volumes:
+      - configMap:
+          name: keycloak-proxy-yml-configmap
+        name: keycloak-proxy-yml-config
+      - configMap:
+          name: init-proxy-configmap
+        name: init-proxy-script
+      imagePullSecrets:
+      - name: yuuvisorg    
+      serviceAccount: check-job-status
+      restartPolicy: OnFailure   

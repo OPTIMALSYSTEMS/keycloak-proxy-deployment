@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: yuuvis
+    name: keycloak-proxy
+  name: keycloak-proxy
+spec:
+  selector:
+    matchLabels:
+      name: keycloak-proxy
+      yuuvislog: "true"
+  template:
+    metadata:
+      labels:
+        name: keycloak-proxy
+        yuuvislog: "true"
+    spec:
+      containers:
+      - env:
+        - name: SPRING_CLOUD_CONFIG_URI
+          value: http://configservice.yuuvis.config
+        image: docker.yuuvis.org/yuuvis/keycloak-proxy:1.1.0
+        imagePullPolicy: IfNotPresent
+        name: keycloak-proxy
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: yuuvisorg
+      restartPolicy: Always
+

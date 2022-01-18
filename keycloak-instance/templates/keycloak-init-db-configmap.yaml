@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-instance-db-init
+data:
+  init-keycloak-db.sh: |
+    if [ "$( psql -h postgresql.infrastructure -p 5432 -U {{.Values.yuuvis.db.user}}   -tAc "SELECT 1 FROM pg_database WHERE datname='{{.Values.yuuvis.keycloak.db.name}}';" )" = '1' ]
+    then
+        echo "{{.Values.yuuvis.keycloak.name}} database already exists"
+    else
+      psql -h postgresql.infrastructure -p 5432 -U {{.Values.yuuvis.db.user}}  -d keycloak -c "CREATE DATABASE {{.Values.yuuvis.keycloak.db.name}};"
+      psql -h postgresql.infrastructure -p 5432 -U {{.Values.yuuvis.db.user}}  -d keycloak -c "GRANT ALL PRIVILEGES ON DATABASE {{.Values.yuuvis.keycloak.db.name}} TO keycloak;"
+    fi

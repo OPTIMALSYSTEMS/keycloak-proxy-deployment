@@ -1,0 +1,18 @@
+apiVersion: v1
+data:
+  keycloak-proxy.yml: |
+    spring.security.user.name: {{.Values.yuuvis.keycloak.proxy.user}}
+    spring.security.user.password: {{.Values.yuuvis.keycloak.proxy.password}}
+
+    logging:
+      level:
+        root: INFO
+        com.os.services.keycloak: DEBUG
+
+    keycloak-proxy.instances:
+    - serverUrl: {{.Values.yuuvis.keycloak.address}}
+      username: {{.Values.yuuvis.keycloak.user}}
+      password: {{.Values.yuuvis.keycloak.password}}
+kind: ConfigMap
+metadata:
+  name: keycloak-proxy-yml-configmap
