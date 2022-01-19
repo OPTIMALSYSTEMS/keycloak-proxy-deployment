@@ -6,8 +6,8 @@ Helm3 - https://github.com/helm/helm/releases/tag/v3.7.2
 ## Deploying keycloak proxy
 Keycloak instances and proxy require unique public listed DNS records.
 ```
-*kc001.example.net*
-*keycloak.proxy.example.net*
+kc001.example.net
+keycloak.proxy.example.net
 ```
 
 Keycloak instances are listed in to the configuration file *keycloak-proxy.yaml* , located in the git repository of the *infrastructure* namespaces.
