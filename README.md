@@ -6,8 +6,8 @@ Helm3 - https://github.com/helm/helm/releases/tag/v3.7.2
 ## Deploying keycloak proxy
 Keycloak instances and proxy require unique public listed DNS records.
 ```
-kc001.example.net
-keycloak.proxy.example.net
+https://kc001.example.net
+https://keycloak.proxy.example.net
 ```
 
 Keycloak instances are listed in to the configuration file *keycloak-proxy.yaml* , located in the git repository of the *infrastructure* namespaces.
@@ -34,5 +34,8 @@ Each keycloak instance can hold up to 50 tenants. Additonal tenants require a ne
 ```
 helm install keycloak-instance-2 ./keycloak-instance -n keycloak-instance-2
 ```
-
+4. Call keycloak proxy refresh endpoint
+```
+https://keycloak.proxy.example.net/refresh
+```
 

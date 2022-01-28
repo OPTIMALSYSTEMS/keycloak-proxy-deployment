@@ -5,7 +5,7 @@ data:
     kubectl wait --for=condition=complete job/config-git-init-commit
 
     echo 'Checking if keycloak-proxy.yml present in git'
-    getkeycloakyml=$(curl -s -o /dev/null -w ''%{http_code}'' http://configservice.yuuvis.svc.cluster.local:80/api/resources/keycloak-proxy.yml)
+    getkeycloakyml=$(curl -s -o /dev/null -w ''%{http_code}'' http://configservice/api/resources/keycloak-proxy.yml)
     echo 'config result '$getkeycloakyml
     
     if [ $getkeycloakyml = 200 ]
@@ -36,7 +36,7 @@ data:
     elif [ $getkeycloakyml = 404 ]
     then
       echo 'must create keycloak-proxy.yml'
-      postyml=$(curl -POST -w  ''%{http_code}'' -F "resource=@/yuuvis/data/keycloak-proxy.yml" http://configservice.yuuvis.svc.cluster.local:80/api/resources/keycloak-proxy.yml)
+      postyml=$(curl -POST -w  ''%{http_code}'' -F "resource=@/yuuvis/data/keycloak-proxy.yml" http://configservice/api/resources/keycloak-proxy.yml)
       
       if [ $postyml != 200 ]
       then
