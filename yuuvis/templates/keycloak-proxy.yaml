@@ -19,7 +19,17 @@ spec:
       containers:
       - env:
         - name: SPRING_CLOUD_CONFIG_URI
-          value: http://configservice.yuuvis.config
+          value: http://configservice/config
+        - name: SPRING_SECURITY_USER_NAME
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: keycloak-proxy-secret
+        - name: SPRING_SECURITY_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: keycloak-proxy-secret
         image: docker.yuuvis.org/yuuvis/keycloak-proxy:1.1.0
         imagePullPolicy: IfNotPresent
         name: keycloak-proxy

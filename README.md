@@ -36,6 +36,5 @@ helm install keycloak-instance-2 ./keycloak-instance -n keycloak-instance-2
 ```
 4. Call keycloak proxy refresh endpoint
 ```
-https://keycloak.proxy.example.net/refresh
+https://keycloak.proxy.example.net/manage/refresh
 ```
-

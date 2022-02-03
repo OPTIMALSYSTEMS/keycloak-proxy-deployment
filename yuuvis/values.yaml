@@ -1,8 +1,9 @@
 yuuvis:
   keycloak:
-    address: kc001.example.net 
-    user: ${KEYCLOAK_ADMIN_USER}
-    password: ${KEYCLOAK_ADMIN_PWD}
+    instance:
+      address: kc001.example.net 
+      user: ${KEYCLOAK_ADMIN_USER}
+      password: ${KEYCLOAK_ADMIN_PWD}
     proxy:
       address: keycloak.proxy.example.net
       user: ${KEYCLOAK_PROXY_USERNAME}

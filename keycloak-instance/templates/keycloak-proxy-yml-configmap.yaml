@@ -2,9 +2,9 @@ apiVersion: v1
 data:
   keycloak-proxy.yml: |
     keycloak-proxy.instances:
-    - serverUrl: {{.Values.yuuvis.keycloak.address}}
-      username: {{.Values.yuuvis.keycloak.user}}
-      password: {{.Values.yuuvis.keycloak.password}}
+    - serverUrl: https://{{.Values.yuuvis.keycloak.instance.address}}/auth
+      username: {{.Values.yuuvis.keycloak.instance.user}}
+      password: {{.Values.yuuvis.keycloak.instance.password}}
 kind: ConfigMap
 metadata:
   name: keycloak-proxy-yml-configmap

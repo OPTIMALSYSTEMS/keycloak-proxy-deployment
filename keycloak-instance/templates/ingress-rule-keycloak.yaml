@@ -16,7 +16,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{.Values.yuuvis.keycloak.address}}
+  - host: {{.Values.yuuvis.keycloak.instance.address}}
     http:
       paths:
       - path: /
@@ -28,5 +28,5 @@ spec:
               number: 80        
   tls:
   - hosts:
-    - {{.Values.yuuvis.keycloak.address}}
+    - {{.Values.yuuvis.keycloak.instance.address}}
     secretName: keycloak-instance-{{ .Release.Namespace }}-cert
