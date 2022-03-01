@@ -30,7 +30,7 @@ spec:
             secretKeyRef:
               key: password
               name: keycloak-proxy-secret
-        image: docker.yuuvis.org/yuuvis/keycloak-proxy:1.1.0
+        image: docker.yuuvis.org/yuuvis/keycloak-proxy:1.2.0-RC01
         imagePullPolicy: IfNotPresent
         name: keycloak-proxy
         ports:
