@@ -7,31 +7,36 @@ imageCredentials:
 yuuvis:
   db:
     user: postgres
-    password: ${DB_ADMIN_PWD} 
+    password: changeme
   keycloak:
     instance:
       #Increment with each additional instance
-      address: kc002.example.net
-      user: ${KEYCLOAK_ADMIN_USER}
-      password: ${KEYCLOAK_ADMIN_PWD}
+      address: auth2.example.net
+      user: changeme
+      password: changeme
     db:
       name: keycloak_instance_2
       user: keycloak
-      password: ${KEYCLOAK_DB_PWD}
+      password: changeme
   git:
     protocol: http
-    url: gitea-http.infrastructure:3000/yuuvis/yuuvis-config.git
-    server: gitea-http.infrastructure:3000
+    url: gogs.infrastructure/yuuvis/yuuvis-config.git
+    server: gogs.infrastructure
     name: yuuvis-config
-    user: ${GITUSER}
-    password: ${GITPWD}
+    user: yuuvis
+    password: changeme
     branch: master
 
 keycloak:
   enabled: true
   fullnameOverride: "keycloak"
   image.repository: docker.yuuvis.org/yuuvis/keycloak
-  image.tag: 15.0.2-stable1
+  #Image tag is reverting to jboss repo, requring manual change:
+  #kubectl edit sts keycloak -n infrastructure
+  #image:docker.yuuvis.org/yuuvis/keycloak/15.0.2-stable1
+  image.tag: "15.0.2"
+  imagePullSecrets: 
+    - name: dockeryuuvisorg
   livenessProbe: |
     httpGet:
       path: /auth/
@@ -59,7 +64,24 @@ keycloak:
       value: /secrets/db-creds/user
     - name: DB_PASSWORD_FILE
       value: /secrets/db-creds/password
+    - name: JGROUPS_DISCOVERY_PROTOCOL
+      value: dns.DNS_PING
+    - name: JGROUPS_DISCOVERY_PROPERTIES
+      value: 'dns_query={{ include "keycloak.serviceDnsName" . }}'
+    - name: CACHE_OWNERS_COUNT
+      value: "2"
+    - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
+      value: "2"
+    - name: JAVA_OPTS
+      value: >-
+        -Djava.net.preferIPv4Stack=true
+        -Djboss.modules.system.pkgs=$JBOSS_MODULES_SYSTEM_PKGS
+        -Djava.awt.headless=true 
+        -Djboss.tx.node.name=$HOSTNAME  
   extraVolumes: |
+    - name: realm-config
+      configMap:
+        name: realmconfigmap
     - name: db-creds
       secret:
         secretName: keycloakdb
@@ -67,6 +89,9 @@ keycloak:
       secret:
         secretName: keycloakuser
   extraVolumeMounts: |
+    - name: realm-config
+      mountPath: "/realm/"
+      readOnly: true
     - name: db-creds
       mountPath: /secrets/db-creds
       readOnly: true
