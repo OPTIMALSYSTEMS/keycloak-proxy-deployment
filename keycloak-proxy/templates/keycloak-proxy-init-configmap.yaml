@@ -1,0 +1,52 @@
+apiVersion: v1
+data:
+  init-proxy.sh: |
+    echo 'Waiting for git init job completion'
+    kubectl wait --for=condition=complete job/config-git-init-commit
+
+    echo 'Checking if keycloak-proxy.yml present in git'
+    getkeycloakyml=$(curl -s -o /dev/null -w ''%{http_code}'' http://configservice/api/resources/keycloak-proxy.yml)
+    echo 'config result '$getkeycloakyml
+    
+    if [ $getkeycloakyml = 200 ]
+    then
+      git config --global user.email yuuvis-init@yuuvis.org
+      git config --global user.name yuuvis-init
+
+      cd ../..
+      git clone {{.Values.yuuvis.git.protocol}}://{{.Values.yuuvis.git.user}}:{{.Values.yuuvis.git.password}}@{{.Values.yuuvis.git.url}} --branch {{.Values.yuuvis.git.branch}}; 
+      
+      yq eval-all --inplace '. as $item ireduce ({}; . *+ $item)' /{{.Values.yuuvis.git.name}}/keycloak-proxy.yml  yuuvis/data/keycloak-proxy.yml 
+
+      cd {{.Values.yuuvis.git.name}}
+      git add .
+      git commit -m 'Updating keycloak-proxy.yml'
+
+      echo 'git pull'
+      git pull -s recursive -X ours
+
+      echo 'git push'    
+      if git push origin {{.Values.yuuvis.git.branch}}
+      then
+          echo 'push sucessful'
+      else
+          echo 'push unsucessful'
+          exit 1
+      fi
+    elif [ $getkeycloakyml != 404 ]
+    then
+      echo 'must create keycloak-proxy.yml'
+      postyml=$(curl -POST -w  ''%{http_code}'' -F "resource=@/yuuvis/data/keycloak-proxy.yml" http://configservice/api/resources/keycloak-proxy.yml)
+      
+      if [ $postyml != 200 ]
+      then
+        echo 'Creating keycloak-proxy.yml failed'
+        exit 1
+      else
+        echo 'Creating keycloak-proxy.yml successful'
+        exit 0
+      fi
+    fi 
+kind: ConfigMap
+metadata:
+  name: init-proxy-configmap

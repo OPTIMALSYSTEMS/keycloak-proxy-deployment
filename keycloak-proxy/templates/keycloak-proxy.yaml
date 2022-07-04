@@ -15,7 +15,13 @@ spec:
       labels:
         name: keycloak-proxy
         yuuvislog: "true"
+        release: {{ .Release.Name }}
     spec:
+      initContainers:
+      - name: init-proxy
+        image: busybox
+        command: ["sh", "-c", "{{.Values.initContainer.command}}"]
+        imagePullPolicy: IfNotPresent      
       containers:
       - env:
         - name: SPRING_CLOUD_CONFIG_URI
@@ -30,7 +36,7 @@ spec:
             secretKeyRef:
               key: password
               name: keycloak-proxy-secret
-        image: docker.yuuvis.org/yuuvis/keycloak-proxy:1.2.0-RC01
+        image: {{.Values.yuuvis.keycloak.proxy.image }}
         imagePullPolicy: IfNotPresent
         name: keycloak-proxy
         ports:
@@ -38,4 +44,3 @@ spec:
       imagePullSecrets:
       - name: yuuvisorg
       restartPolicy: Always
-

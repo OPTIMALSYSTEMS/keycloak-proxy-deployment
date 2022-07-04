@@ -1,0 +1,21 @@
+yuuvis:
+  keycloak:
+    instance:
+      address: auth.dms-dev2.kdcbslab.dev
+      user: keycloak
+      password: changeme
+    proxy:
+      address: auth.proxy.dms-os2.kdcbslab.dev
+      user: keycloak
+      password: changeme
+      image: docker.yuuvis.org/yuuvis/keycloak-proxy:1.4.0-keycloak-15.1.1
+  git:
+    protocol: http
+    url: gogs.infrastructure/yuuvis/yuuvis-config.git
+    server: gogs.infrastructure
+    name: yuuvis-config
+    user: yuuvis
+    password: changeme
+    branch: master  
+initContainer:
+  command: "until wget -q --spider http://configservice/api/resources/application-docker.yml; do echo waiting for configservice; sleep 11; done;"    
