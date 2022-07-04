@@ -4,37 +4,23 @@
 Helm3 - https://github.com/helm/helm/releases/tag/v3.7.2
 
 ## Deploying keycloak proxy
-Keycloak instances and proxy require unique public listed DNS records.
+Register DNS records for all keycloak instances and proxy.
 ```
-https://kc001.example.net
-https://keycloak.proxy.example.net
+https://auth.example.net
+https://proxy.example.net
 ```
+Instances are listed in config file *keycloak-proxy.yaml*.
 
-Keycloak instances are listed in to the configuration file *keycloak-proxy.yaml* , located in the git repository of the *infrastructure* namespaces.
-
-### Infrastructure chart
-1. Set DNS, keycloak-instance/database/git credentials for default keycloak instance in *infrastructure/values.yaml*   
-2. Integrate templates and values into yuuvis api *infrastructure* helm chart.
-3. Install infrastructure helm chart according to yuuvis api helm chart documentation.
-
-### Yuuvis chart
-1. Set DNS and credentials for keycloak proxy in *yuuvis/values.yaml*. 
-2. Set DNS and credentials for default keycloak instance, database and git, as specified in *infrastructure/values*.yaml. These are subsequently added to *keycloak-proxy.yaml* via kubernetes job. 
-3. Integrate templates and values into yuuvis api *yuuvis* helm chart.
-4. Install yuuvis helm chart according to yuuvis api helm chart documentation.
-
-Keycloak proxy is now running in *yuuvis* namespace and pointing to default keycloak instance running in *infrastructure* nameespace.
+### Keycloak proxy chart
+Edit *changeme* credentials and DNS records in *keycloak-proxy/values.yaml*
+```
+helm install keycloak-proxy ./keycloak-proxy -n yuuvis
+```
+Keycloak proxy is now running in *yuuvis* namespace.
 
 ## Adding new keycloak instance
-Each keycloak instance can hold up to 50 tenants. Additonal tenants require a new instance.
-
-1. Set DNS and credentials for new keycloak instance in *keycloak-instance/values.yaml*
-2. Set credentials for database and git, as specified in *infrastructure/values*.yaml.
-3. Install keycloak instance via helm to new namespace.
+Edit *changeme* credentials and DNS records in *keycloak-instance/values.yaml*
 ```
 helm install keycloak-instance-2 ./keycloak-instance -n keycloak-instance-2
 ```
-4. Call keycloak proxy refresh endpoint
-```
-https://keycloak.proxy.example.net/manage/refresh
-```
+Keycloak instances can hold up to 100 tenants.
